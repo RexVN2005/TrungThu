@@ -24,21 +24,84 @@ canvas#starfield {
 }
 
 /* 🌕 Mặt trăng */
-.moon {
+.moon-container {
   position: absolute;
   top: 60px;
   right: 100px;
   width: 160px;
   height: 160px;
-  background: radial-gradient(circle at 30% 30%, #fff, #f8f8f8 70%, #e0e0e0 100%);
-  border-radius: 50%;
-  box-shadow:
-    0 0 50px #ffffff7a,
-    0 0 80px rgba(255, 255, 255, 0.7),
-    0 0 100ox rgba(255, 255, 255, 0.4);
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.moon-container:hover .moon-twinkle {
+  animation: twinkle 0.5s ease-in-out infinite;
+  transform: scale(1.5);
+}
+
+.moon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   filter: drop-shadow(0 0 25px rgba(255, 255, 200, 0.8));
   animation: moonGlow 6s ease-in-out infinite;
-  z-index: 10;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.moon:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 40px rgba(255, 255, 200, 1)) drop-shadow(0 0 60px rgba(255, 255, 150, 0.8));
+  animation: moonHover 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes moonHover {
+  0% { 
+    transform: scale(1.1) rotate(0deg);
+  }
+  100% { 
+    transform: scale(1.15) rotate(2deg);
+  }
+}
+
+/* ✨ Hiệu ứng lấp lánh cho mặt trăng */
+.moon-twinkle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff;
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.moon-twinkle:nth-child(2) {
+  top: 20px;
+  left: 30px;
+  animation-delay: 0.5s;
+}
+
+.moon-twinkle:nth-child(3) {
+  top: 50px;
+  right: 20px;
+  animation-delay: 1s;
+}
+
+.moon-twinkle:nth-child(4) {
+  bottom: 30px;
+  left: 50px;
+  animation-delay: 1.5s;
+}
+
+@keyframes twinkle {
+  0%, 100% { 
+    opacity: 0; 
+    transform: scale(0.5);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.2);
+  }
 }
 
 @keyframes moonGlow {
@@ -47,11 +110,16 @@ canvas#starfield {
 }
 
 @media (max-width:600px) {
-  .moon {
+  .moon-container {
     top: 40px;
     right: 14px;
     width: 70px;
     height: 70px;
+  }
+  
+  .moon-twinkle {
+    width: 2px;
+    height: 2px;
   }
 }
 
@@ -67,11 +135,41 @@ canvas#starfield {
   z-index: 10;
 }
 
+
 .lantern {
   position: absolute;
   pointer-events: auto;
   width: 40px;
   user-select: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  filter: drop-shadow(0 0 15px rgba(255, 200, 0, 0.6)) drop-shadow(0 0 25px rgba(255, 150, 0, 0.4));
+  animation: lanternGlow 3s ease-in-out infinite;
+}
+
+.lantern:hover {
+  transform: scale(1.2) rotate(5deg);
+  filter: brightness(1.3) drop-shadow(0 0 20px rgba(255, 255, 0, 0.8)) drop-shadow(0 0 40px rgba(255, 200, 0, 0.6)) drop-shadow(0 0 60px rgba(255, 150, 0, 0.4));
+  z-index: 100;
+  animation: lanternHover 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes lanternHover {
+  0% { 
+    filter: brightness(1.3) drop-shadow(0 0 20px rgba(255, 255, 0, 0.8)) drop-shadow(0 0 40px rgba(255, 200, 0, 0.6)) drop-shadow(0 0 60px rgba(255, 150, 0, 0.4));
+  }
+  100% { 
+    filter: brightness(1.5) drop-shadow(0 0 30px rgba(255, 255, 0, 1)) drop-shadow(0 0 60px rgba(255, 200, 0, 0.8)) drop-shadow(0 0 80px rgba(255, 150, 0, 0.6));
+  }
+}
+
+@keyframes lanternGlow {
+  0%, 100% { 
+    filter: drop-shadow(0 0 15px rgba(255, 200, 0, 0.6)) drop-shadow(0 0 25px rgba(255, 150, 0, 0.4));
+  }
+  50% { 
+    filter: drop-shadow(0 0 20px rgba(255, 220, 0, 0.8)) drop-shadow(0 0 35px rgba(255, 180, 0, 0.6)) drop-shadow(0 0 45px rgba(255, 140, 0, 0.4));
+  }
 }
 
 @keyframes swing {
@@ -135,24 +233,72 @@ canvas#starfield {
   box-sizing: border-box;
   text-shadow: 0 0 25px #ffd180;
   box-shadow: 0 0 20px #ff8a50, 0 0 25px #ffd180;
+  animation: wishPopupAppear 0.5s ease-out;
+}
+
+@keyframes wishPopupAppear {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
 }
 
 .wish-img {
-  width: 80px;
+  width: 280px;
   height: auto;
   display: block;
-  margin: 0 auto 10px auto;
+  margin: 0 auto 20px auto;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+  animation: wishImageAppear 0.6s ease-out, float 2.5s ease-in-out infinite;
+}
+
+.wish-img:hover {
+  transform: scale(1.05);
+}
+
+@keyframes wishImageAppear {
+  0% {
+    transform: scale(0) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
 }
 
 @media (max-width: 600px) {
   #wish-popup {
     font-size: 1.2rem;
     padding: 20px 25px;
-    max-width: 80%;
-    width: 80%;
+    max-width: 90%;
+    width: 90%;
   }
   .wish-img {
-    width: 50px;
+    width: 180px;
+    margin: 0 auto 15px auto;
+  }
+}
+
+@media (min-width: 1200px) {
+  .wish-img {
+    width: 350px;
+    margin: 0 auto 25px auto;
+  }
+  #wish-popup {
+    font-size: 2.2rem;
+    padding: 45px 55px;
+    max-width: 55%;
   }
 }
 
@@ -176,15 +322,8 @@ canvas#starfield {
     height: 20px;
   }
 }
-.wish-img {
-  width: 90px;
-  height: auto;
-  display: block;
-  margin: 0 auto 12px auto;
-  animation: float 2.5s ease-in-out infinite;
-}
-
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
 }
+

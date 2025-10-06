@@ -24,11 +24,35 @@ function drawStars() {
   for (const s of stars) {
     s.a += (Math.random() > 0.5 ? 1 : -1) * s.t;
     s.a = Math.max(0.05, Math.min(1, s.a));
+    
+    // Tạo hiệu ứng lấp lánh mạnh hơn
+    const twinkle = Math.sin(Date.now() * 0.003 + s.x * 0.01) * 0.3 + 0.7;
+    const currentAlpha = s.a * twinkle;
+    
     ctx.beginPath();
-    ctx.globalAlpha = s.a;
-    ctx.fillStyle = "#fff";
+    ctx.globalAlpha = currentAlpha;
+    
+    // Tạo gradient cho ngôi sao
+    const gradient = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 2);
+    gradient.addColorStop(0, "#ffffff");
+    gradient.addColorStop(0.5, "#ffd700");
+    gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+    
+    ctx.fillStyle = gradient;
     ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
     ctx.fill();
+    
+    // Thêm hiệu ứng tia sáng cho một số ngôi sao
+    if (Math.random() < 0.1) {
+      ctx.strokeStyle = `rgba(255, 255, 255, ${currentAlpha * 0.5})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(s.x - s.r * 3, s.y);
+      ctx.lineTo(s.x + s.r * 3, s.y);
+      ctx.moveTo(s.x, s.y - s.r * 3);
+      ctx.lineTo(s.x, s.y + s.r * 3);
+      ctx.stroke();
+    }
   }
   ctx.globalAlpha = 1;
 }
@@ -85,12 +109,12 @@ loop();
 const lanternContainer = document.getElementById("lantern-container");
 
 const wishes = [
-  "Chúc em Trung Thu ấm áp và tràn đầy niềm vui!",
-  "Chúc em luôn vui vẻ và hạnh phúc, yêu em!",
-  "Mong em luôn sáng như trăng, ngọt như bánh nướng!",
+  "Chúc cậu Trung Thu ấm áp và tràn đầy niềm vui!",
+  "Chúc cậu Trung thu an lành, hạnh phúc, ngày càng xinh đẹp như chị Hằng nhé!",
+  "Mong cậu luôn sáng như trăng, ngọt như bánh nướng!",
   "Trung Thu vui vẻ, ngập tràn tiếng cười!",
-  "Chúc em mọi điều tốt đẹp và may mắn!",
-  "Anh yêu em mãi mãi, chúc em Trung Thu hạnh phúc!",
+  "Chúc cậu mọi điều tốt đẹp và may mắn!",
+  "Chúc mừng Tết Trung thu, mong vầng trăng tròn sẽ mang tới hạnh phúc và thành công cho gia đình bạn!",
 ];
 
 // 🌸 Danh sách hình ảnh (random)
@@ -102,9 +126,17 @@ const wishImages = [
   "images/wish5.png"
 ];
 
+// 🏮 Danh sách đèn lồng (random)
+const lanternImages = [
+  "den.png",
+  "den1.png", 
+  "den2.png"
+];
+
 function createLantern() {
   const lantern = document.createElement("img");
-  lantern.src = "den.png";
+  const randomLantern = lanternImages[Math.floor(Math.random() * lanternImages.length)];
+  lantern.src = randomLantern;
   lantern.className = "lantern swing";
 
   const layer = Math.floor(Math.random() * 3) + 1;
@@ -125,26 +157,66 @@ function createLantern() {
   }
 
   lantern.style.width = size + "px";
-  lantern.style.left = Math.random() * 90 + "vw";
+  lantern.style.left = Math.random() * 100 + "vw"; // Random starting position across full width
   lantern.style.bottom = "0px";
   lantern.style.opacity = opacity;
+  
+  // Thêm hiệu ứng sáng động ngẫu nhiên
+  const glowIntensity = 0.4 + Math.random() * 0.4; // 0.4-0.8
+  const glowSize = 15 + Math.random() * 20; // 15-35px
+  const glowColor = Math.random() > 0.5 ? 
+    `rgba(255, ${200 + Math.random() * 55}, 0, ${glowIntensity})` : 
+    `rgba(255, ${150 + Math.random() * 50}, ${50 + Math.random() * 50}, ${glowIntensity})`;
+  
+  lantern.style.filter = `drop-shadow(0 0 ${glowSize}px ${glowColor}) drop-shadow(0 0 ${glowSize * 1.5}px ${glowColor.replace(/[\d.]+\)$/, '0.3)')})`;
 
   lanternContainer.appendChild(lantern);
 
-  const drift = Math.random() * 140 - 70;
+  // Random diagonal direction: -1 for left, 1 for right
+  const direction = Math.random() > 0.5 ? 1 : -1;
+  const drift = direction * (150 + Math.random() * 200); // Much more pronounced diagonal movement
   const up = 120 + Math.random() * 40;
+  const rotation = direction * (20 + Math.random() * 30); // More rotation for dramatic effect
+  
   lantern.animate(
     [
-      { transform: "translate(0,0)", opacity: opacity },
-      { transform: `translate(${drift}px, -${up}vh)`, opacity: 0 }
+      { transform: "translate(0,0) rotate(0deg)", opacity: opacity },
+      { transform: `translate(${drift}px, -${up}vh) rotate(${rotation}deg)`, opacity: 0 }
     ],
     { duration: duration, easing: "linear", fill: "forwards" }
   );
+  
+  // Thêm hiệu ứng sáng động khi bay lên
+  const glowAnimation = lantern.animate([
+    { 
+      filter: `drop-shadow(0 0 ${glowSize}px ${glowColor}) drop-shadow(0 0 ${glowSize * 1.5}px ${glowColor.replace(/[\d.]+\)$/, '0.3)')})`
+    },
+    { 
+      filter: `drop-shadow(0 0 ${glowSize * 1.2}px ${glowColor}) drop-shadow(0 0 ${glowSize * 1.8}px ${glowColor.replace(/[\d.]+\)$/, '0.4)')}) drop-shadow(0 0 ${glowSize * 2.5}px ${glowColor.replace(/[\d.]+\)$/, '0.2)')})`
+    },
+    { 
+      filter: `drop-shadow(0 0 ${glowSize * 0.8}px ${glowColor}) drop-shadow(0 0 ${glowSize * 1.2}px ${glowColor.replace(/[\d.]+\)$/, '0.2)')})`
+    }
+  ], {
+    duration: duration,
+    easing: "ease-in-out"
+  });
 
   setTimeout(() => lantern.remove(), duration);
 
+  // Hiệu ứng hover cho đèn lồng
+  lantern.addEventListener("mouseenter", (e) => {
+    e.target.style.animationPlayState = "paused";
+    e.target.style.animation = "lanternHover 0.6s ease-in-out infinite alternate";
+  });
+
+  lantern.addEventListener("mouseleave", (e) => {
+    e.target.style.animation = "swing 2s ease-in-out infinite";
+  });
+
   lantern.addEventListener("click", (e) => {
     e.stopPropagation();
+    
     const popup = document.getElementById("wish-popup");
     const text = document.getElementById("wish-text");
     const img = document.getElementById("wish-img");
@@ -160,6 +232,28 @@ function createLantern() {
 }
 
 setInterval(createLantern, 500);
+
+
+
+
+
+
+
+
+
+
+
+// ===== Hiệu ứng hover cho mặt trăng =====
+const moon = document.querySelector('.moon');
+if (moon) {
+  moon.addEventListener('mouseenter', () => {
+    moon.style.animation = 'moonHover 0.5s ease-in-out infinite alternate';
+  });
+  
+  moon.addEventListener('mouseleave', () => {
+    moon.style.animation = 'moonGlow 6s ease-in-out infinite';
+  });
+}
 
 // ===== Nhạc nền =====
 const bg = document.getElementById("bg-music");
