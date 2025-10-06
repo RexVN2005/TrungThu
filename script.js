@@ -124,8 +124,8 @@ const wishes = [
 
 // 🌸 Danh sách hình ảnh (random)
 const wishImages = [
-  "images/wish1.png",
-  "images/wish2.png",
+  "images/wish1.webp",
+  "images/wish2.jpg",
   "images/wish3.png",
   "images/wish4.png",
   "images/wish5.png"
