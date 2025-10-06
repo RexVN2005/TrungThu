@@ -3,6 +3,11 @@ const canvas = document.getElementById("starfield");
 const ctx = canvas.getContext("2d");
 let w, h, stars = [], meteors = [];
 
+// Performance optimization: Cache frequently used values
+let animationId;
+const TWINKLE_SPEED = 0.003;
+const METEOR_CHANCE = 0.01;
+
 function resizeCanvas() {
   w = canvas.width = innerWidth;
   h = canvas.height = innerHeight;
@@ -26,7 +31,7 @@ function drawStars() {
     s.a = Math.max(0.05, Math.min(1, s.a));
     
     // Tạo hiệu ứng lấp lánh mạnh hơn
-    const twinkle = Math.sin(Date.now() * 0.003 + s.x * 0.01) * 0.3 + 0.7;
+    const twinkle = Math.sin(Date.now() * TWINKLE_SPEED + s.x * 0.01) * 0.3 + 0.7;
     const currentAlpha = s.a * twinkle;
     
     ctx.beginPath();
@@ -97,8 +102,8 @@ function drawMeteors() {
 function loop() {
   drawStars();
   drawMeteors();
-  if (Math.random() < 0.01) createMeteor();
-  requestAnimationFrame(loop);
+  if (Math.random() < METEOR_CHANCE) createMeteor();
+  animationId = requestAnimationFrame(loop);
 }
 
 window.addEventListener("resize", resizeCanvas);
@@ -231,7 +236,19 @@ function createLantern() {
   });
 }
 
-setInterval(createLantern, 500);
+// Optimize lantern creation with throttling
+let lastLanternTime = 0;
+const LANTERN_INTERVAL = 500;
+
+function createLanternThrottled() {
+  const now = Date.now();
+  if (now - lastLanternTime >= LANTERN_INTERVAL) {
+    createLantern();
+    lastLanternTime = now;
+  }
+}
+
+setInterval(createLanternThrottled, LANTERN_INTERVAL);
 
 
 
@@ -274,7 +291,10 @@ document.addEventListener("pointerdown", function startMusicOnce() {
         bg.volume = v;
       }, 120);
       musicStarted = true;
-    }).catch(e => console.log("Không thể phát nhạc:", e));
+    }).catch(e => {
+      console.warn("Không thể phát nhạc:", e);
+      musicStarted = true; // Prevent retry
+    });
   }
   document.removeEventListener("pointerdown", startMusicOnce);
 });
